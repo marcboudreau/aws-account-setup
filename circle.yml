@@ -1,0 +1,28 @@
+test:
+  override:
+    - |
+      set -exo pipefail
+      export BUCKET_NAME=$(jq -r '.variable.bucket_name.default' bucket.tf.json)-test
+      ./setup-bucket.sh
+      test -z "$(aws s3api get-bucket-acl \
+          --bucket $BUCKET_NAME | \
+        jq -r '.Grants[].Grantee | select(.URI == "http://acs.amazonaws.com/groups/global/AuthenticatedUsers")')"
+      aws s3api put-bucket-acl \
+          --bucket $BUCKET_NAME \
+          --acl authenticated-read
+    - |
+      set -exo pipefail
+      export BUCKET_NAME=marcboudreau-$(uuidgen | cut -d- -f1 | tr '[:upper:]' '[:lower:]')-test
+      ./setup-bucket.sh
+      test -z "$(aws s3api get-bucket-acl \
+          --bucket $BUCKET_NAME | \
+        jq -r '.Grants[].Grantee | select(.URI == "http://acs.amazonaws.com/groups/global/AuthenticatedUsers")')"
+      aws s3api delete-bucket \
+          --bucket $BUCKET_NAME
+deployment:
+  deploy-master:
+    branch: master
+    commands:
+      - |
+        BUCKET_NAME=$(jq -r '.variable.bucket_name.default' bucket.tf.json) \
+          ./setup-bucket.sh
