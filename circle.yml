@@ -2,7 +2,7 @@ test:
   override:
     - |
       set -exo pipefail
-      export BUCKET_NAME=$(jq -r '.variable.bucket_name.default' bucket.tf.json)-test
+      export BUCKET_NAME=$(jq -r '.terraform.backend.s3.bucket' terraform/backend.tf.json)-test
       ./setup-bucket.sh
       test -z "$(aws s3api get-bucket-acl \
           --bucket $BUCKET_NAME | \
@@ -33,5 +33,5 @@ deployment:
     branch: master
     commands:
       - |
-        BUCKET_NAME=$(jq -r '.variable.bucket_name.default' bucket.tf.json) \
+        BUCKET_NAME=$(jq -r '.terraform.backend.s3.bucket' terraform/backend.tf.json) \
           ./setup-bucket.sh
