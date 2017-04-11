@@ -7,9 +7,15 @@ test:
       test -z "$(aws s3api get-bucket-acl \
           --bucket $BUCKET_NAME | \
         jq -r '.Grants[].Grantee | select(.URI == "http://acs.amazonaws.com/groups/global/AuthenticatedUsers")')"
+      test -n "$(aws s3api get-bucket-versioning \
+          --bucket $BUCKET_NAME | \
+        jq '.')"
       aws s3api put-bucket-acl \
           --bucket $BUCKET_NAME \
           --acl authenticated-read
+      aws s3api put-bucket-versioning \
+          --bucket $BUCKET_NAME \
+          --versioning-configuration Status=Suspended
     - |
       set -exo pipefail
       export BUCKET_NAME=marcboudreau-$(uuidgen | cut -d- -f1 | tr '[:upper:]' '[:lower:]')-test
@@ -17,6 +23,9 @@ test:
       test -z "$(aws s3api get-bucket-acl \
           --bucket $BUCKET_NAME | \
         jq -r '.Grants[].Grantee | select(.URI == "http://acs.amazonaws.com/groups/global/AuthenticatedUsers")')"
+      test -n "$(aws s3api get-bucket-versioning \
+          --bucket $BUCKET_NAME | \
+        jq '.')"
       aws s3api delete-bucket \
           --bucket $BUCKET_NAME
 deployment:

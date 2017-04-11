@@ -25,4 +25,11 @@ if ! aws s3api head-bucket --bucket $bucket_name 2> /dev/null; then
 fi
 
 # Make sure the right ACL is set
-aws s3api put-bucket-acl --bucket $bucket_name --acl private
+aws s3api put-bucket-acl \
+		--bucket $bucket_name \
+		--acl private
+
+# Make sure bucket versioning is enabled
+aws s3api put-bucket-versioning \
+		--bucket $bucket_name \
+		--versioning-configuration Status=Enabled
