@@ -1,6 +1,6 @@
 {
 	"terraform": {
-		"backend": {
+		"backend" : {
 			"s3": {
 				"bucket": "marcboudreau-371d9884",
 				"key": "terraform/cloud-account-setup/global.tfstate",
